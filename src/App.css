@@ -1,0 +1,11 @@
+.App {
+  text-align: center;
+}
+
+.todos {
+  max-width: 500px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
