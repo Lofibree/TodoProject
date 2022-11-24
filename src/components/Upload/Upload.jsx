@@ -5,6 +5,7 @@ import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { set } from 'firebase/database';
 import { useDispatch } from 'react-redux';
 import { uploadTC } from '../../redux/todoReducer';
+import { auth } from '../../firebase/firebaseInit';
 
 const Upload = (props) => {
 // debugger
@@ -13,6 +14,7 @@ const Upload = (props) => {
     const [imgUrl, setImgUrl] = useState([]);
     const [percent, setPercent] = useState(0);
     const dispatch = useDispatch();
+    // const todosArr = use
 
     const handleChange = (e) => {
         console.log(e.target.files)
@@ -24,7 +26,7 @@ const Upload = (props) => {
             return;
         }
         console.log(selectedFile)
-        const storageRef = ref(storage, `files/${selectedFile.name}`)
+        const storageRef = ref(storage, `${auth.currentUser.uid}/${props.uid}/files/${selectedFile.name}`)
         console.log(storageRef)
         // selectedFile.map(f => {
             const uploadTask = uploadBytesResumable(storageRef, selectedFile)
@@ -38,7 +40,8 @@ const Upload = (props) => {
                     getDownloadURL(uploadTask.snapshot.ref).then((url) => {
                         console.log(url)
                         setImgUrl((oldArr) => [...oldArr, url])
-                        dispatch(uploadTC(url, props.uid))
+                        dispatch(uploadTC(url, selectedFile[0].name, props.uid))
+                        setSelectedFile(null)
                     })
                 })
         // })
@@ -46,25 +49,24 @@ const Upload = (props) => {
     const handlePick = () => {
         filePicker.current.click()
     }
+    const imgUrlEl = imgUrl.map(i => <img src={i} className={s.img} />)
     return (
         <div>
             <button onClick={handlePick} >Pick file</button>
             <input type='file' onChange={handleChange} accept='image/*' ref={filePicker} className={s.hidden} />
             <button onClick={handleUpload} >Upload</button>
-            <p>{percent} % done</p>
-            <div>
-                {selectedFile && (
-                    <ul>
-                        <li>Name: {selectedFile.name}</li>
-                        <li>Type: {selectedFile.type}</li>
-                        <li>Size: {selectedFile.size}</li>
-                        {/* {props.filesUrl.map(f => <img src={f} className={s.img} />)
-                        } */}
-                        {/* <li><img src={props.filesUrl[0]} className={s.img} /></li> */}
-                        {/* <li>Last mo: {selectedFile.size}</li> */}
-                    </ul>
-                )}
-            </div>
+            {/* <p>{percent} % done</p> */}
+            {selectedFile &&
+                <>
+                    <p>{percent} % done</p>
+                    <div>Selected photo's name: {selectedFile.name}</div>
+                </>
+            }
+            <div>Added photos</div>
+            {props.filesUrl !== (null || undefined)
+                ? Object.values(props.filesUrl).map(i => <img src={i.fileUrl} className={s.img} />)
+                : 'No photos yet'
+            }
         </div>
     );
 };

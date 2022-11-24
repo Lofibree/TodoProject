@@ -2,6 +2,9 @@ import { todoAPI } from "../api/api";
 import { getDatabase, onValue, ref, set, remove, update } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { uid } from "uid";
+import { deleteObject, ref as refStorage } from "firebase/storage";
+import { storage } from "../firebase/firebaseInit";
+// import {deleteFiles} from 'firebase/storage'
 
 const SET_TODOS = 'todoReducer/SET_TODOS'
 const DELETE_TODO = 'todoReducer/DELETE_TODO'
@@ -92,6 +95,7 @@ export const upload = (url, uid) => ({type: UPLOAD, url, uid})
 
 export const setTodosTC = () => async (dispatch) => {
     // debugger
+    // console.log(initialState.todosArr)
     dispatch(setTodos([])) 
     const auth = getAuth()
     const todosListRef = `/${auth.currentUser.uid}`;
@@ -114,11 +118,11 @@ export const deleteTodoTC = (uid) => async (dispatch) => {
     const todoRef = `/${auth.currentUser.uid}/${uid}`;
     remove(ref(database, todoRef))
     dispatch(deleteTodo(uid))
-    dispatch(setTodosTC()) 
+    dispatch(setTodosTC())
 }
 export const createTodoTC = (title, description, date) => async (dispatch) => {
     // debugger
-    const auth = getAuth()
+    const auth = getAuth() 
     try {
         let userUid = auth.currentUser.uid
         let uidd = uid();
@@ -138,7 +142,6 @@ export const createTodoTC = (title, description, date) => async (dispatch) => {
         console.log(err)
     }
     dispatch(setTodosTC()) 
-
 }
 export const updateTodoTC = (formData, uid) => async (dispatch) => {
     // debugger
@@ -164,7 +167,7 @@ export const updateTodoTC = (formData, uid) => async (dispatch) => {
     }
     dispatch(setTodosTC()) 
 }
-export const uploadTC = (url, uidd) => async (dispatch) => {
+export const uploadTC = (url, imgName, uidd) => async (dispatch) => {
     // debugger
     const auth = getAuth()
     const database = getDatabase();
@@ -172,7 +175,8 @@ export const uploadTC = (url, uidd) => async (dispatch) => {
     const todoRef = `/${auth.currentUser.uid}/${uidd}/filesUrl/${uidForImg}`;
     if (url) {
         set(ref(database, todoRef), {
-            fileUrl: url
+            fileUrl: url,
+            imgName: imgName
         })
         dispatch(upload(url, uidd))
     }

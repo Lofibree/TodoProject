@@ -6,17 +6,22 @@
     margin: 5px;
     width: 450px;
     max-height: 400px;
-    /* min-height: 150px; */
     display: grid;
-    grid-template-rows: 1fr 3fr;
+    grid-template-rows: 1fr 2fr;
     box-shadow: 0 5px 15px 0 rgb(0 0 0 / 50%);
     margin: 20px;
     padding: 10px;
 }
 .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: grid;
+    grid-template-rows: 1fr 0.5fr;
+}
+.title {
+    display: block;
+}
+.title.active {
+    text-decoration: line-through;
+    background-color: blueviolet;
 }
 .main {
     align-items: center;

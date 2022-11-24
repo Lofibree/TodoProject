@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { deleteTodoTC, updateTodoTC } from '../../redux/todoReducer';
 import s from '../TodoItem/TodoItem.module.css'
-import { Form, Field } from 'react-final-form'
 import Upload from '../Upload/Upload';
+import { TodoItemEditDescriptionForm, TodoItemEditTitleForm, TodoItemEditIsCompletedForm } from './TodoForms/TodoForms';
 
 const TodoItem = (props) => {
 
@@ -11,9 +11,16 @@ const TodoItem = (props) => {
     const [isEditTitle, setIsEditTitle] = useState(false)
     const [isEditDescription, setIsEditDescription] = useState(false)
     const [isEditIsCompleted, setIsEditIsCompleted] = useState(false)
+    const [styleCompleted, setStyleCompleted] = useState(s.title)
 
+    useEffect(() => {
+        if (props.isCompleted) {
+            setStyleCompleted(s.title + ' ' + s.active)
+        } else { setStyleCompleted(s.title) }
+    }, [props.isCompleted])
     // DELETE
     const handleDeleteTodo = (uid) => {
+        // debugger
         dispatch(deleteTodoTC(uid))
     }
     // EDIT TITLE
@@ -34,17 +41,20 @@ const TodoItem = (props) => {
         }
         dispatch(updateTodoTC(formData, props.uid))
     }
+
     return (
         <div className={s.todoItem}>
             <div className={s.header} >
-                <div>Заголовок: {props.title}</div>
+                <div className={styleCompleted} >Заголовок: {props.title}</div>
                 <div>
-                    {isEditTitle
-                        ? <TodoItemEditTitleForm handleTitleUpdate={handleSubmit} />
-                        : <button onClick={titleUpdateInit} >Edit Title</button>
-                    }
+                    <div>
+                        {isEditTitle
+                            ? <TodoItemEditTitleForm handleTitleUpdate={handleSubmit} />
+                            : <button onClick={titleUpdateInit} >Edit Title</button>
+                        }
+                    </div>
+                    <div>Deadline: {props.date}</div>
                 </div>
-                <div>{props.date}</div>
             </div>
             <div className={s.main}>
                 <div>
@@ -60,11 +70,12 @@ const TodoItem = (props) => {
                                 : <button onClick={descriptionUpdateInit} >Edit Description</button>
                             }
                         </div>
+                        <Upload uid={props.uid} filesUrl={props.filesUrl} />
                     </div>
                 </div>
                 <div>
-                    <button onClick={() => handleDeleteTodo(props.uid)}>Delete</button>
-                    <Upload uid={props.uid} filesUrl={props.filesUrl} />
+                    <button onClick={() => handleDeleteTodo(props.uid)}>Delete Todo</button>
+                    {/* <Upload uid={props.uid} filesUrl={props.filesUrl} /> */}
                 </div>
             </div>
         </div>
@@ -73,48 +84,6 @@ const TodoItem = (props) => {
 
 
 
-const TodoItemEditTitleForm = (props) => {
-    return (
-        <Form onSubmit={(values) => {props.handleTitleUpdate(values)}}
-            render={renderProps => {
-                const { handleSubmit } = renderProps;
-                return (
-                    <form onSubmit={handleSubmit}>
-                        <Field name='editTitle' type='text' placeholder='edit title' component='input' />
-                        <button>Confirm edit Title</button>
-                    </form>
-                )}}
-        ></Form>
-    )
-}
-const TodoItemEditDescriptionForm = (props) => {
-    return (
-        <Form onSubmit={(values) => {props.handleDescriptionUpdate(values)}}
-            render={renderProps => {
-                const { handleSubmit } = renderProps;
-                return (
-                    <form onSubmit={event => {handleSubmit(event)}}>
-                        <Field name='editDescription' type='text' placeholder='edit description' component='textarea' />
-                        <button>Confirm edit Description</button>
-                    </form>
-                )}}
-        ></Form>
-    )
-}
-const TodoItemEditIsCompletedForm = (props) => {
-    return (
-        <Form onSubmit={(values) => {props.handleIsCompletedUpdate(values)}}
-            render={renderProps => {
-                const { handleSubmit } = renderProps;
-                return (
-                    <form onSubmit={event => {handleSubmit(event)}}>
-                        <Field name='editIsCompleted' type="checkbox" component='input' />
-                        <button>Confirm edit Completed</button>
-                    </form>
-                )}}
-        ></Form>
-    )
-}
 
 
 
