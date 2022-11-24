@@ -41,15 +41,14 @@ const todoReducer = (state = initialState, action) => {
                     uid: action.uid,
                     title: action.title,
                     description: action.description,
-                    timeAmount: action.time
+                    date: action.date,
+                    isCompleted: false
                 }
                 return {
                     ...state,
                     todosArr: [...state.todosArr, newTodo],
                 }
-            } else if(check) {
-                return state
-            }
+            } else if (check) { return state }
         }
         case UPDATE_TODO: {
             // debugger
@@ -59,7 +58,13 @@ const todoReducer = (state = initialState, action) => {
                 todosArr: [...state.todosArr]
             }
             stateCopy.todosArr[neededIndex] = {...state.todosArr[neededIndex]}
-            stateCopy.todosArr[neededIndex].title = action.formData.title;
+            if (action.formData.editTitle) {
+                stateCopy.todosArr[neededIndex].title = action.formData.editTitle;
+            } else if (action.formData.editDescription) {
+                stateCopy.todosArr[neededIndex].description = action.formData.editDescription;
+            } else if (action.formData.editIsCompleted) {
+                stateCopy.todosArr[neededIndex].isCompleted = action.formData.editIsCompleted;
+            }
             return stateCopy;
         }
         default:
@@ -69,7 +74,7 @@ const todoReducer = (state = initialState, action) => {
 
 export const setTodos = (todosArr) => ({type: SET_TODOS, todosArr})
 export const deleteTodo = (uid) => ({type: DELETE_TODO, uid})
-export const createTodo = (uid, title, description, time) => ({type: CREATE_TODO, uid, title, description, time})
+export const createTodo = (uid, title, description, date) => ({type: CREATE_TODO, uid, title, description, date})
 export const updateTodo = (formData, uid) => ({type: UPDATE_TODO, formData, uid})
 
 
@@ -97,9 +102,9 @@ export const deleteTodoTC = (uid) => async (dispatch) => {
     const todoRef = `/${auth.currentUser.uid}/${uid}`;
     remove(ref(database, todoRef))
     dispatch(deleteTodo(uid))
-
+    dispatch(setTodosTC()) 
 }
-export const createTodoTC = (title, description, time) => async (dispatch) => {
+export const createTodoTC = (title, description, date) => async (dispatch) => {
     // debugger
     const auth = getAuth()
     try {
@@ -111,13 +116,15 @@ export const createTodoTC = (title, description, time) => async (dispatch) => {
             uid: uidd,
             title: title,
             description: description,
-            timeAmount: time
+            date: date,
+            isCompleted: false
         })
-        dispatch(createTodo(uidd, title, description, time))
+        dispatch(createTodo(uidd, title, description, date))
         console.log('success')
     } catch (err) {
         console.log(err)
     }
+    dispatch(setTodosTC()) 
 
 }
 export const updateTodoTC = (formData, uid) => async (dispatch) => {
@@ -126,10 +133,25 @@ export const updateTodoTC = (formData, uid) => async (dispatch) => {
     const database = getDatabase();
 
     const todoRef = `/${auth.currentUser.uid}/${uid}`;
-    update(ref(database, todoRef), {
-        title: formData.editTitle,
-    })
-    dispatch(updateTodo())
+    if (formData.editTitle) {
+        // debugger
+        update(ref(database, todoRef), {
+            title: formData.editTitle,
+        })
+        dispatch(updateTodo(formData, uid))
+    } else if (formData.editDescription) {
+        update(ref(database, todoRef), {
+            description: formData.editDescription,
+        })
+        dispatch(updateTodo(formData, uid))
+    } else if (formData.editIsCompleted !== (null || undefined)) {
+        // debugger
+        update(ref(database, todoRef), {
+            isCompleted: formData.editIsCompleted,
+        })
+        dispatch(updateTodo(formData, uid))
+    }
+    dispatch(setTodosTC()) 
 }
 
 

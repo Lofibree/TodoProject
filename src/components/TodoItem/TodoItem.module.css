@@ -1,14 +1,38 @@
+
 .todoItem {
     background-color: grey;
     padding: 10px;
     border-radius: 10px;
     margin: 5px;
-    width: 400px;
+    width: 450px;
     max-height: 400px;
+    /* min-height: 150px; */
     display: grid;
-    grid-template-columns: 1fr;
     grid-template-rows: 1fr 3fr;
     box-shadow: 0 5px 15px 0 rgb(0 0 0 / 50%);
     margin: 20px;
     padding: 10px;
+}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.main {
+    align-items: center;
+    display: grid;
+    grid-template-columns: 60px 1fr 60px;
+}
+.todoBody {
+    padding: 10px;
+    margin: 0 auto;
+    max-width: 230px;
+    min-height: 100px;
+    min-width: 200px;
+    border-radius: 10px;
+    background-color: cadetblue;
+    box-shadow: 0 5px 15px 0 rgb(0 0 0 / 50%);
+}
+.description {
+    word-wrap: break-word;
 }

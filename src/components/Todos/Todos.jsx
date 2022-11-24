@@ -13,10 +13,10 @@ const Todos = () => {
 
   useEffect(() => {
     dispatch(setTodosTC())
-  }, [todosArr])
+  }, [])
 
   const handleCreateTodo = (formData) => {
-    const {newTodoTitle, newTodoDescription, newTodoTime} = formData
+    const { newTodoTitle, newTodoDescription, newTodoTime } = formData
     dispatch(createTodoTC(newTodoTitle, newTodoDescription, newTodoTime))
 
   }
@@ -25,7 +25,8 @@ const Todos = () => {
     uid={t.uid}
     title={t.title}
     description={t.description}
-    timeAmount={t.timeAmount}
+    date={t.date}
+    isCompleted={t.isCompleted}
   />)
 
   return (
@@ -36,20 +37,30 @@ const Todos = () => {
         render={({ handleSubmit, reset, submitting, pristine, values }) => (
           <form
             onSubmit={event => {
-              handleSubmit(event).then(reset);
+              handleSubmit(event);
             }}
             className={s.form}
           >
-            <Field name='newTodoTitle' type='text' placeholder='new todo title' component='input' className={s.field} />
-            <Field name='newTodoDescription' type='text' placeholder='new todo describtion' component='textarea' className={s.field} />
-            <Field name='newTodoTime' type='time' placeholder='new todo describtion' component='input' className={s.field} />
+            <div>
+              <div>Заголовок</div>
+              <Field name='newTodoTitle' type='text' placeholder='new todo title' component='input' className={s.field} />
+            </div>
+            <div>
+              <div>Описание</div>
+              <Field name='newTodoDescription' type='text' placeholder='new todo describtion' component='textarea' className={s.field} />
+            </div>
+            <div>
+              <div>Дата завершения</div>
+              <Field name='newTodoTime' type='date' placeholder='new todo describtion' component='input' className={s.field} />
+            </div>
             <button type='submit'>Create</button>
           </form>
         )}
       >
       </Form>
       <div>
-        {todosEl}
+        <div> You have {todosArr.length} todos</div>
+        <div>{todosEl}</div>
       </div>
     </div>
   );
