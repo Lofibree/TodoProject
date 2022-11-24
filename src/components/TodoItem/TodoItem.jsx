@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { deleteTodoTC, updateTodoTC } from '../../redux/todoReducer';
 import s from '../TodoItem/TodoItem.module.css'
 import { Form, Field } from 'react-final-form'
+import Upload from '../Upload/Upload';
 
 const TodoItem = (props) => {
 
@@ -63,6 +64,7 @@ const TodoItem = (props) => {
                 </div>
                 <div>
                     <button onClick={() => handleDeleteTodo(props.uid)}>Delete</button>
+                    <Upload uid={props.uid} filesUrl={props.filesUrl} />
                 </div>
             </div>
         </div>

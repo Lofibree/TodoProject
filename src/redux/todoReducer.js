@@ -7,6 +7,7 @@ const SET_TODOS = 'todoReducer/SET_TODOS'
 const DELETE_TODO = 'todoReducer/DELETE_TODO'
 const CREATE_TODO = 'todoReducer/CREATE_TODO'
 const UPDATE_TODO = 'todoReducer/UPDATE_TODO'
+const UPLOAD = 'todoReducer/UPLOAD'
 
 
 let initialState = {
@@ -42,7 +43,8 @@ const todoReducer = (state = initialState, action) => {
                     title: action.title,
                     description: action.description,
                     date: action.date,
-                    isCompleted: false
+                    isCompleted: false,
+                    fileUrl: []
                 }
                 return {
                     ...state,
@@ -67,6 +69,15 @@ const todoReducer = (state = initialState, action) => {
             }
             return stateCopy;
         }
+        case UPLOAD: {
+            let neededIndex = state.todosArr.findIndex(t => t.uid === action.uid);
+            let stateCopy = {
+                ...state,
+                todosArr: [...state.todosArr]
+            }
+            stateCopy.todosArr[neededIndex] = {...state.todosArr[neededIndex]}
+            stateCopy.todosArr[neededIndex].fileUrl.push(action.url)
+        }
         default:
             return state;
     }
@@ -76,6 +87,7 @@ export const setTodos = (todosArr) => ({type: SET_TODOS, todosArr})
 export const deleteTodo = (uid) => ({type: DELETE_TODO, uid})
 export const createTodo = (uid, title, description, date) => ({type: CREATE_TODO, uid, title, description, date})
 export const updateTodo = (formData, uid) => ({type: UPDATE_TODO, formData, uid})
+export const upload = (url, uid) => ({type: UPLOAD, url, uid})
 
 
 export const setTodosTC = () => async (dispatch) => {
@@ -117,7 +129,8 @@ export const createTodoTC = (title, description, date) => async (dispatch) => {
             title: title,
             description: description,
             date: date,
-            isCompleted: false
+            isCompleted: false,
+            // filesUrl
         })
         dispatch(createTodo(uidd, title, description, date))
         console.log('success')
@@ -134,7 +147,6 @@ export const updateTodoTC = (formData, uid) => async (dispatch) => {
 
     const todoRef = `/${auth.currentUser.uid}/${uid}`;
     if (formData.editTitle) {
-        // debugger
         update(ref(database, todoRef), {
             title: formData.editTitle,
         })
@@ -145,7 +157,6 @@ export const updateTodoTC = (formData, uid) => async (dispatch) => {
         })
         dispatch(updateTodo(formData, uid))
     } else if (formData.editIsCompleted !== (null || undefined)) {
-        // debugger
         update(ref(database, todoRef), {
             isCompleted: formData.editIsCompleted,
         })
@@ -153,6 +164,21 @@ export const updateTodoTC = (formData, uid) => async (dispatch) => {
     }
     dispatch(setTodosTC()) 
 }
+export const uploadTC = (url, uidd) => async (dispatch) => {
+    // debugger
+    const auth = getAuth()
+    const database = getDatabase();
+    const uidForImg = uid()
+    const todoRef = `/${auth.currentUser.uid}/${uidd}/filesUrl/${uidForImg}`;
+    if (url) {
+        set(ref(database, todoRef), {
+            fileUrl: url
+        })
+        dispatch(upload(url, uidd))
+    }
+    dispatch(setTodosTC()) 
+}
+
 
 
 export default todoReducer;

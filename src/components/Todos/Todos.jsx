@@ -27,8 +27,9 @@ const Todos = () => {
     description={t.description}
     date={t.date}
     isCompleted={t.isCompleted}
+    filesUrl={t.filesUrl}
   />)
-
+    console.log(todosArr)
   return (
     <div className={s.todosBox} >
       <Form
