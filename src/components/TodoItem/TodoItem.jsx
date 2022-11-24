@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { deleteTodoTC, updateTodoTC } from '../../redux/todoReducer';
@@ -10,17 +11,29 @@ const TodoItem = (props) => {
     const dispatch = useDispatch();
     const [isEditTitle, setIsEditTitle] = useState(false)
     const [isEditDescription, setIsEditDescription] = useState(false)
-    const [isEditIsCompleted, setIsEditIsCompleted] = useState(false)
+    // const [isEditIsCompleted, setIsEditIsCompleted] = useState(false)
+    // const [isTodoCompleted, setIsTodoCompleted] = useState(true)
     const [styleCompleted, setStyleCompleted] = useState(s.title)
+    const [styleExpired, setStyleExpired] = useState(s.date)
+    const [date, setDate] = useState(props.date)
 
     useEffect(() => {
         if (props.isCompleted) {
             setStyleCompleted(s.title + ' ' + s.active)
         } else { setStyleCompleted(s.title) }
-    }, [props.isCompleted])
+
+        let now = dayjs().locale('ru').format('YYYY-MM-DD')
+        if (now > props.date) {
+            setDate('Просрочено')
+            setStyleExpired(s.date + ' ' + s.expired)
+        } else if(now === props.date) {
+            setDate('СЕГОДНЯ ПОСЛЕДНИЙ ДЕНЬ!!!')
+            setStyleExpired(s.date + ' ' + s.almost)
+        } else { setDate(props.date) }
+    }, [props.isCompleted, props.date])
+
     // DELETE
     const handleDeleteTodo = (uid) => {
-        // debugger
         dispatch(deleteTodoTC(uid))
     }
     // EDIT TITLE
@@ -36,9 +49,7 @@ const TodoItem = (props) => {
             setIsEditTitle(false)
         } else if (formData.editDescription) { // EDIT DESCRIPTION
             setIsEditDescription(false)
-        } else if (formData.editIsCompleted !== (null || undefined)) { // EDIT ISCOMPLETED
-            setIsEditIsCompleted(false)
-        }
+        } 
         dispatch(updateTodoTC(formData, props.uid))
     }
 
@@ -49,16 +60,19 @@ const TodoItem = (props) => {
                 <div>
                     <div>
                         {isEditTitle
-                            ? <TodoItemEditTitleForm handleTitleUpdate={handleSubmit} />
-                            : <button onClick={titleUpdateInit} >Edit Title</button>
+                            ? <>
+                                <TodoItemEditTitleForm handleTitleUpdate={handleSubmit} />
+                                <button onClick={() => setIsEditTitle(false)}>Отмена</button>
+                            </>
+                            : <button onClick={titleUpdateInit} >Изменить заголовок</button>
                         }
                     </div>
-                    <div>Deadline: {props.date}</div>
+                    <div className={styleExpired} >Дата завершения: {date}</div>
                 </div>
             </div>
             <div className={s.main}>
                 <div>
-                    <div>{props.isCompleted ? 'Completed' : 'Not Completed'}</div>
+                    {/* <div>{props.isCompleted ? 'Завершена' : 'Не завершена'}</div> */}
                     <TodoItemEditIsCompletedForm handleIsCompletedUpdate={handleSubmit} />
                 </div>
                 <div className={s.todoBody}>
@@ -66,16 +80,18 @@ const TodoItem = (props) => {
                         <div className={s.description}>{props.description}</div>
                         <div>
                             {isEditDescription
-                                ? <TodoItemEditDescriptionForm handleDescriptionUpdate={handleSubmit} />
-                                : <button onClick={descriptionUpdateInit} >Edit Description</button>
+                                ? <>
+                                    <TodoItemEditDescriptionForm handleDescriptionUpdate={handleSubmit} />
+                                    <button onClick={() => setIsEditDescription(false)}>Отмена</button>
+                                </>
+                                : <button onClick={descriptionUpdateInit} >Изменить описание</button>
                             }
                         </div>
                         <Upload uid={props.uid} filesUrl={props.filesUrl} />
                     </div>
                 </div>
                 <div>
-                    <button onClick={() => handleDeleteTodo(props.uid)}>Delete Todo</button>
-                    {/* <Upload uid={props.uid} filesUrl={props.filesUrl} /> */}
+                    <button onClick={() => handleDeleteTodo(props.uid)}>Удалить задачу</button>
                 </div>
             </div>
         </div>

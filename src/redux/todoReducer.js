@@ -2,7 +2,7 @@ import { todoAPI } from "../api/api";
 import { getDatabase, onValue, ref, set, remove, update } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { uid } from "uid";
-import { deleteObject, ref as refStorage } from "firebase/storage";
+import { deleteObject, getDownloadURL, ref as refStorage, uploadBytes } from "firebase/storage";
 import { storage } from "../firebase/firebaseInit";
 // import {deleteFiles} from 'firebase/storage'
 
@@ -167,19 +167,25 @@ export const updateTodoTC = (formData, uid) => async (dispatch) => {
     }
     dispatch(setTodosTC()) 
 }
-export const uploadTC = (url, imgName, uidd) => async (dispatch) => {
+export const uploadTC = (file, uidd) => async (dispatch) => {
     // debugger
     const auth = getAuth()
     const database = getDatabase();
     const uidForImg = uid()
     const todoRef = `/${auth.currentUser.uid}/${uidd}/filesUrl/${uidForImg}`;
-    if (url) {
-        set(ref(database, todoRef), {
-            fileUrl: url,
-            imgName: imgName
+    const storageRef = refStorage(storage, `${auth.currentUser.uid}/${uidd}/files/${file.name}`)
+    uploadBytes(storageRef, file).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((url) => {
+            console.log(url)
+            if (url) {
+                set(ref(database, todoRef), {
+                    fileUrl: url,
+                    imgName: file.name
+                })
+                dispatch(upload(url, uidd))
+            }
         })
-        dispatch(upload(url, uidd))
-    }
+    })
     dispatch(setTodosTC()) 
 }
 

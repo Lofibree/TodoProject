@@ -1,0 +1,24 @@
+
+.description {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    margin: 10px;
+    padding: 15px;
+    box-shadow: 0 5px 15px 0 rgb(0 0 0 / 50%);
+    border-radius: 10px;
+    background-color: rgb(15, 83, 86);
+    align-items: center;
+}
+.description textarea {
+    max-width: 200px;
+    min-width: 200px;
+    max-height: 40px;
+    min-height: 40px;
+}
+.description button {
+    min-height: fit-content;
+    max-height: 20px;
+    min-width: fit-content;
+    max-width: fit-content;
+    margin: 5px auto;
+}

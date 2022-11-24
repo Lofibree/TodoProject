@@ -1,5 +1,5 @@
 import { Form, Field } from 'react-final-form'
-
+import s from './TodoForms.module.css'
 
 export const TodoItemEditTitleForm = (props) => {
     return (
@@ -9,7 +9,7 @@ export const TodoItemEditTitleForm = (props) => {
                 return (
                     <form onSubmit={handleSubmit}>
                         <Field name='editTitle' type='text' placeholder='edit title' component='input' />
-                        <button>Confirm edit Title</button>
+                        <button>Подтвердить изменение</button>
                     </form>
                 )}}
         ></Form>
@@ -21,9 +21,9 @@ export const TodoItemEditDescriptionForm = (props) => {
             render={renderProps => {
                 const { handleSubmit } = renderProps;
                 return (
-                    <form onSubmit={event => {handleSubmit(event)}}>
+                    <form onSubmit={event => {handleSubmit(event)}} className={s.description} >
                         <Field name='editDescription' type='text' placeholder='edit description' component='textarea' />
-                        <button>Confirm edit Description</button>
+                        <button>Подтвердить изменение</button>
                     </form>
                 )}}
         ></Form>
@@ -36,8 +36,9 @@ export const TodoItemEditIsCompletedForm = (props) => {
                 const { handleSubmit } = renderProps;
                 return (
                     <form onSubmit={event => {handleSubmit(event)}}>
+                        <div>Завершить задачу</div>
                         <Field name='editIsCompleted' type="checkbox" component='input' />
-                        <button>Confirm edit Completed</button>
+                        <button>Завершить</button>
                     </form>
                 )}}
         ></Form>

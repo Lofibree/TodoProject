@@ -4,10 +4,9 @@
     padding: 10px;
     border-radius: 10px;
     margin: 5px;
-    width: 450px;
-    max-height: 400px;
+    width: 500px;
     display: grid;
-    grid-template-rows: 1fr 2fr;
+    grid-template-rows: 0.5fr 1fr;
     box-shadow: 0 5px 15px 0 rgb(0 0 0 / 50%);
     margin: 20px;
     padding: 10px;
@@ -15,25 +14,46 @@
 .header {
     display: grid;
     grid-template-rows: 1fr 0.5fr;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 .title {
     display: block;
+    font-size: 25px;
 }
 .title.active {
     text-decoration: line-through;
     background-color: blueviolet;
 }
+.date {
+    display: block;
+    margin: 5px;
+    padding: 5px;
+}
+.date.expired {
+    background-color: red;
+    margin: 5px;
+    padding: 5px;
+}
+.date.almost {
+    background-color: rgb(179, 255, 0);
+    margin: 5px;
+    padding: 5px;
+}
 .main {
     align-items: center;
     display: grid;
-    grid-template-columns: 60px 1fr 60px;
+    grid-template-columns: 100px 1fr 60px;
+    height: fit-content;
 }
 .todoBody {
     padding: 10px;
     margin: 0 auto;
     max-width: 230px;
+    width: 230px;
     min-height: 100px;
-    min-width: 200px;
+    min-width: fit-content;
+    border-radius: 10px;
     border-radius: 10px;
     background-color: cadetblue;
     box-shadow: 0 5px 15px 0 rgb(0 0 0 / 50%);

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import TodoItem from '../TodoItem/TodoItem';
 import { Form, Field } from 'react-final-form'
-import { getAuth } from 'firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { createTodoTC, setTodosTC } from '../../redux/todoReducer';
 import s from './Todos.module.css'
@@ -18,7 +17,6 @@ const Todos = () => {
   const handleCreateTodo = (formData) => {
     const { newTodoTitle, newTodoDescription, newTodoTime } = formData
     dispatch(createTodoTC(newTodoTitle, newTodoDescription, newTodoTime))
-
   }
 
   const todosEl = todosArr.map(t => <TodoItem
@@ -35,11 +33,9 @@ const Todos = () => {
       <Form
         onSubmit={values => handleCreateTodo(values)}
         initialValues={{ employed: true }}
-        render={({ handleSubmit, reset, submitting, pristine, values }) => (
+        render={({ handleSubmit }) => (
           <form
-            onSubmit={event => {
-              handleSubmit(event);
-            }}
+            onSubmit={event => {handleSubmit(event)}}
             className={s.form}
           >
             <div>
@@ -54,13 +50,13 @@ const Todos = () => {
               <div>Дата завершения</div>
               <Field name='newTodoTime' type='date' placeholder='new todo describtion' component='input' className={s.field} />
             </div>
-            <button type='submit'>Create</button>
+            <button type='submit'>Создать</button>
           </form>
         )}
       >
       </Form>
       <div>
-        <div> You have {todosArr.length} todos</div>
+        <div>Всего задач: {todosArr.length}</div>
         <div>{todosEl}</div>
       </div>
     </div>
