@@ -1,47 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteTodoTC, onTitleEditChangeAC, updateTodoTC } from '../../redux/todoReducer';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { deleteTodoTC, updateTodoTC } from '../../redux/todoReducer';
 import s from '../TodoItem/TodoItem.module.css'
 import { Form, Field } from 'react-final-form'
-import { getDatabase, onValue, ref, remove, set, update } from "firebase/database";
-import { getAuth } from 'firebase/auth';
-// import { database } from '../../firebase/firebase';
 
 const TodoItem = (props) => {
 
-    const auth = getAuth()
-    const database = getDatabase();
-    // const [editTitle, setEditTitle] = useState(props.title)
-    const [tempUidd, setTempUidd] = useState()
+    const dispatch = useDispatch();
     const [isEdit, setIsEdit] = useState(false)
 
     const handleDeleteTodo = (uid) => {
-        const todoRef = `/${auth.currentUser.uid}/${uid}`;
-        console.log(todoRef)
-        remove(ref(database, todoRef))
+        dispatch(deleteTodoTC(uid))
     }
-
     const titleUpdateInit = () => {
-        setIsEdit(true)
-        setTempUidd(props.uid)
+        // debugger
+        console.log(isEdit)
+        setIsEdit(false)
+        console.log(isEdit)
     }
     const handleTitleUpdate = (formData) => {
-        const database = getDatabase();
-        const todoRef = `/${auth.currentUser.uid}/${props.uid}`;
-        update(ref(database, todoRef), {
-            title: formData.editTitle,
-        })
+        dispatch(updateTodoTC(formData, props.uid))
     }
     return (
         <div className={s.todoItem}>
-            <div>{props.title}</div>
-            <button onClick={() => handleDeleteTodo(props.uid)}>Delete</button>
-            <button type='button' onClick={titleUpdateInit} >Edit</button>
-            {isEdit
-                ?
-                <TodoItemForm handleTitleUpdate={handleTitleUpdate} />
-                : <div>dfgdfgdf</div>
-            }
+            <div>Заголовок: {props.title}</div>
+            {/* <div>Id: {props.uid}</div> */}
+            <div>
+                <button onClick={() => handleDeleteTodo(props.uid)}>Delete</button>
+                <button onClick={() => setIsEdit(true)} >Edit</button>
+                {isEdit
+                    ? <TodoItemForm handleTitleUpdate={handleTitleUpdate} />
+                    : <div>dfgdfgdf</div>
+                }
+            </div>
         </div>
     );
 };
@@ -51,13 +42,13 @@ const TodoItem = (props) => {
 const TodoItemForm = (props) => {
     return (
         <Form
-            onSubmit={(values) => {
-                props.handleTitleUpdate(values)
-            }}
+            onSubmit={(values) => {props.handleTitleUpdate(values)}}
             render={renderProps => {
                 const { handleSubmit } = renderProps;
                 return (
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={event => {
+                        handleSubmit(event)
+                    }}>
                         <Field name='editTitle' type='text' placeholder='edit title' component='input' />
                         <button>Confirm edit</button>
                     </form>

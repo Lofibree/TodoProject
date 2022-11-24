@@ -15,7 +15,9 @@ const HomePage = () => {
             <button type='button' onClick={logout}>Logout</button>
             <NavLink to={'/profile'} ><button>Go to profile</button></NavLink>
             <NavLink to={'/'} ><button>Go to init page</button></NavLink>
-            <Todos />
+            {/* <div> */}
+                <Todos />
+                {/* </div> */}
         </div>
     );
 };

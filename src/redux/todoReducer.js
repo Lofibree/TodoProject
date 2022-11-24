@@ -1,28 +1,26 @@
-import { todoAPI } from "../api/api"
+import { todoAPI } from "../api/api";
+import { getDatabase, onValue, ref, set, remove, update } from "firebase/database";
+import { getAuth } from "firebase/auth";
+import { uid } from "uid";
 
 const SET_TODOS = 'todoReducer/SET_TODOS'
 const DELETE_TODO = 'todoReducer/DELETE_TODO'
 const CREATE_TODO = 'todoReducer/CREATE_TODO'
 const UPDATE_TODO = 'todoReducer/UPDATE_TODO'
-const ON_TITLE_CHANGE = 'todoReducer/ON_TITLE_CHANGE'
-const ON_TITLE_EDIT_CHANGE = 'todoReducer/ON_TITLE_EDIT_CHANGE'
+
 
 let initialState = {
     todosArr: [],
-    newTodoText: 'text',
-    editTodoText: 'edit text',
-    totalTodosCount: 200,
 }
 
 
 const todoReducer = (state = initialState, action) => {
     switch (action.type) {
         case SET_TODOS: {
-            debugger
+            // debugger
             return {
                 ...state,
                 todosArr: [...action.todosArr],
-                totalTodosCount: state.todosArr.length
             }
         }
         case DELETE_TODO: {
@@ -30,93 +28,108 @@ const todoReducer = (state = initialState, action) => {
             let stateCopy = {
                 ...state,
                 todosArr: [...state.todosArr],
-                totalTodosCount: state.todosArr.length
             }
-            let neededIndex = stateCopy.todosArr.findIndex(t => t.id === action.id);
+            let neededIndex = stateCopy.todosArr.findIndex(t => t.uid === action.uid);
             stateCopy.todosArr.splice(neededIndex, 1);
-            stateCopy.totalTodosCount = stateCopy.totalTodosCount - 1;
             return stateCopy;
         }
         case CREATE_TODO: {
             // debugger
-            let newTodo = {
-                userId: 1,
-                id: state.todosArr.length + 1,
-                title: action.title
-            }
-            return {
-                ...state,
-                todosArr: [...state.todosArr, newTodo],
-                totalTodosCount: action.totalTodosCount + 1
+            let check = state.todosArr.some(t => t.uid === action.uid)
+            if (!check) {
+                let newTodo = {
+                    uid: action.uid,
+                    title: action.title,
+                    description: action.description,
+                    timeAmount: action.time
+                }
+                return {
+                    ...state,
+                    todosArr: [...state.todosArr, newTodo],
+                }
+            } else if(check) {
+                return state
             }
         }
         case UPDATE_TODO: {
             // debugger
-            let neededIndex = state.todosArr.findIndex(t => t.id === action.id);
+            let neededIndex = state.todosArr.findIndex(t => t.uid === action.uid);
             let stateCopy = {
                 ...state,
                 todosArr: [...state.todosArr]
             }
             stateCopy.todosArr[neededIndex] = {...state.todosArr[neededIndex]}
-            // debugger
-            stateCopy.todosArr[neededIndex].title = action.title;
-            // debugger
+            stateCopy.todosArr[neededIndex].title = action.formData.title;
             return stateCopy;
         }
-        case ON_TITLE_CHANGE: {
-            // debugger
-            return {
-                ...state,
-                todosArr: [...state.todosArr],
-                newTodoText: action.title
-            }
-        }
-        case ON_TITLE_EDIT_CHANGE: {
-            // debugger
-            return {
-                ...state,
-                todosArr: [...state.todosArr],
-                editTodoText: action.title
-            }
-        }
-        default: 
-        return state;
+        default:
+            return state;
     }
 }
 
 export const setTodos = (todosArr) => ({type: SET_TODOS, todosArr})
-export const deleteTodo = (id) => ({type: DELETE_TODO, id})
-export const createTodo = (title, totalTodosCount) => ({type: CREATE_TODO, title, totalTodosCount})
-export const updateTodo = (title, id) => ({type: UPDATE_TODO, title, id})
-export const onTitleChangeAC = (title) => ({type: ON_TITLE_CHANGE, title})
-export const onTitleEditChangeAC = (title) => ({type: ON_TITLE_EDIT_CHANGE, title})
+export const deleteTodo = (uid) => ({type: DELETE_TODO, uid})
+export const createTodo = (uid, title, description, time) => ({type: CREATE_TODO, uid, title, description, time})
+export const updateTodo = (formData, uid) => ({type: UPDATE_TODO, formData, uid})
 
 
 export const setTodosTC = () => async (dispatch) => {
     // debugger
-    const todosArr = await todoAPI.setTodos();
-    dispatch(setTodos(todosArr))
+    dispatch(setTodos([])) 
+    const auth = getAuth()
+    const todosListRef = `/${auth.currentUser.uid}`;
+    try {
+        const database = getDatabase();
+        const todoListUpdateRef = ref(database, todosListRef)
+        onValue(todoListUpdateRef, (snapshot) => {
+            let data = snapshot.val();
+            if (data) {
+                dispatch(setTodos(Object.values(data)))
+            }
+        })
+    } catch (err) { console.log(err) }
 }
-export const deleteTodoTC = (id) => async (dispatch) => {
+export const deleteTodoTC = (uid) => async (dispatch) => {
     // debugger
-    const response = await todoAPI.deleteTodo(id);
-    response === {}
-    ? dispatch(deleteTodo(id))
-    : dispatch(deleteTodo(id))
+    const auth = getAuth()
+    const database = getDatabase();
+
+    const todoRef = `/${auth.currentUser.uid}/${uid}`;
+    remove(ref(database, todoRef))
+    dispatch(deleteTodo(uid))
+
 }
-export const createTodoTC = (title, totalTodosCount) => async (dispatch) => {
+export const createTodoTC = (title, description, time) => async (dispatch) => {
     // debugger
-    const response = await todoAPI.createTodo(title, totalTodosCount);
-    response === {}
-    ? dispatch(createTodo(title, totalTodosCount))
-    : dispatch(createTodo(title, totalTodosCount))
+    const auth = getAuth()
+    try {
+        let userUid = auth.currentUser.uid
+        let uidd = uid();
+        const database = getDatabase();
+        const todoRef = `${userUid}/${uidd}`;
+        set(ref(database, todoRef), {
+            uid: uidd,
+            title: title,
+            description: description,
+            timeAmount: time
+        })
+        dispatch(createTodo(uidd, title, description, time))
+        console.log('success')
+    } catch (err) {
+        console.log(err)
+    }
+
 }
-export const updateTodoTC = (title, id) => async (dispatch) => {
+export const updateTodoTC = (formData, uid) => async (dispatch) => {
     // debugger
-    const response = await todoAPI.updateTodo(title, id);
-    response === {}
-    ? dispatch(updateTodo(title, id))
-    : dispatch(updateTodo(title, id))
+    const auth = getAuth()
+    const database = getDatabase();
+
+    const todoRef = `/${auth.currentUser.uid}/${uid}`;
+    update(ref(database, todoRef), {
+        title: formData.editTitle,
+    })
+    dispatch(updateTodo())
 }
 
 

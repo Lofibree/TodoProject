@@ -1,0 +1,25 @@
+.todosBox {
+    max-width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+.form {
+    display: flex;
+    flex-direction: column;
+    max-width: fit-content;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px 0 rgb(0 0 0 / 50%);
+    margin: 10px;
+    padding: 10px;
+}
+.field {
+    margin: 5px;
+    max-width: 200px;
+    max-height: 100px;
+    border-radius: 5px;
+}

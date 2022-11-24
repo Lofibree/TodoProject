@@ -1,97 +1,56 @@
 import React, { useEffect } from 'react';
-import { useState } from 'react';
 import TodoItem from '../TodoItem/TodoItem';
-import { getDatabase, onValue, ref, set } from "firebase/database";
 import { Form, Field } from 'react-final-form'
-import { uid } from 'uid';
 import { getAuth } from 'firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
-import { setTodos } from '../../redux/todoReducer';
+import { createTodoTC, setTodosTC } from '../../redux/todoReducer';
+import s from './Todos.module.css'
 
 const Todos = () => {
 
-  const auth = getAuth()
-  const [todosList, setTodosList] = useState([])
-  const [todo, setTodo] = useState([])
-  // const dispatch = useDispatch();
-  // const todosArr = useSelector(state => state.todoPage.todosArr)
+  const dispatch = useDispatch();
+  const todosArr = useSelector(state => state.todoPage.todosArr)
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        getUpdatedTodoList()
-        // dispatch(setTodos(todosList))
-      }
-    })
-  }, [])
-  const todosListRef = `/${auth.currentUser.uid}`;
-  console.log(auth.currentUser.uid)
-
-  const getUpdatedTodoList = () => {
-    try {
-      const database = getDatabase();
-      const todoListUpdateRef = ref(database, todosListRef)
-      onValue(todoListUpdateRef, (snapshot) => {
-        setTodosList([])
-        let data = snapshot.val();
-        if (data) {
-          Object.values(data).map(todo => {
-            setTodosList((oldArray) => [...oldArray, todo])
-          })
-        }
-        console.log(todosList)
-        console.log(Object.values(data))
-      })
-    } catch (err) {
-      console.log(err)
-    }
-  }
+    dispatch(setTodosTC())
+  }, [todosArr])
 
   const handleCreateTodo = (formData) => {
-    try {
-      let userUid = auth.currentUser.uid
-      let uidd = uid();
-      const database = getDatabase();
-      const todoRef = `${userUid}/${uidd}`;
-      set(ref(database, todoRef), {
-        uid: uidd,
-        title: formData.newTodoTitle,
-        description: formData.newTodoDescription,
-        timeAmount: formData.newTodoTime
-      })
-      console.log('success')
-    } catch (err) {
-      console.log(err)
-    }
+    const {newTodoTitle, newTodoDescription, newTodoTime} = formData
+    dispatch(createTodoTC(newTodoTitle, newTodoDescription, newTodoTime))
+
   }
-  
-  const todosEl = todosList.map(t => <TodoItem
-    title={t.title}
+
+  const todosEl = todosArr.map(t => <TodoItem
     uid={t.uid}
+    title={t.title}
     description={t.description}
     timeAmount={t.timeAmount}
   />)
 
   return (
-    <div>
+    <div className={s.todosBox} >
       <Form
-        onSubmit={(values) => {
-          handleCreateTodo(values)
-        }}
-        render={renderProps => {
-          const { handleSubmit } = renderProps;
-          return (
-            <form onSubmit={handleSubmit}>
-              <Field name='newTodoTitle' type='text' placeholder='new todo title' component='input' />
-              <Field name='newTodoDescription' type='text' placeholder='new todo describtion' component='textarea' />
-              <Field name='newTodoTime' type='time' placeholder='new todo describtion' component='input' />
-              <button type='submit'>Create</button>
-            </form>
-          )
-        }}
+        onSubmit={values => handleCreateTodo(values)}
+        initialValues={{ employed: true }}
+        render={({ handleSubmit, reset, submitting, pristine, values }) => (
+          <form
+            onSubmit={event => {
+              handleSubmit(event).then(reset);
+            }}
+            className={s.form}
+          >
+            <Field name='newTodoTitle' type='text' placeholder='new todo title' component='input' className={s.field} />
+            <Field name='newTodoDescription' type='text' placeholder='new todo describtion' component='textarea' className={s.field} />
+            <Field name='newTodoTime' type='time' placeholder='new todo describtion' component='input' className={s.field} />
+            <button type='submit'>Create</button>
+          </form>
+        )}
       >
       </Form>
-      {todosEl}
+      <div>
+        {todosEl}
+      </div>
     </div>
   );
 };
