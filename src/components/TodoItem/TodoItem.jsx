@@ -31,7 +31,7 @@ const TodoItem = (props) => {
     const checkDeadline = (date) => {
         let now = dayjs().locale('ru').format('YYYY-MM-DD')
         if (now > date) {
-            setDate('Просрочено')
+            setDate(`${date} (ПРОСРОЧЕНО)`)
             setStyleExpired(s.date + ' ' + s.expired)
         } else if(now === date) {
             setDate('СЕГОДНЯ ПОСЛЕДНИЙ ДЕНЬ!!!')
