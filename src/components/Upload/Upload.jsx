@@ -11,7 +11,8 @@ const Upload = (props) => {
     const filePicker = useRef(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const dispatch = useDispatch();
-    const isFetchingFile = useSelector(state => state.todoPage.isFetchingFile)
+    // const isFetchingFile = useSelector(state => state.todoPage.isFetchingFile)
+    const [isFileUploading, setIsFileUploading] = useState(false)
 
     const handlePick = () => {
         filePicker.current.click()
@@ -20,12 +21,15 @@ const Upload = (props) => {
         console.log(e.target.files)
         setSelectedFile(e.target.files[0])
     }
-    const handleUpload = () => {
+    const handleUpload = async () => {
+        // debugger
         if (!selectedFile) {
             alert('Пожалуйста выберите файл');
             return;
         }
+        setIsFileUploading(true)
         dispatch(uploadTC(selectedFile, props.uid))
+        setIsFileUploading(false)
         setSelectedFile(null)
     }
     const deleteFile= (fileName, fileUid) => {
@@ -43,7 +47,7 @@ const Upload = (props) => {
                 </>
             }
             <div>Прикрепленные файлы</div>
-            {isFetchingFile
+            {isFileUploading
                 ? <Preloader />
                 : <> {props.filesUrl !== (null || undefined)
                     ? Object.values(props.filesUrl).map(i => {

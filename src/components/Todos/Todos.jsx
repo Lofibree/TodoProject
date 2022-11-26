@@ -17,8 +17,10 @@ const Todos = () => {
   }, [])
 
   const handleCreateTodo = (formData) => {
-    const { newTodoTitle, newTodoDescription, newTodoTime } = formData
-    dispatch(createTodoTC(newTodoTitle, newTodoDescription, newTodoTime))
+    if (Object.keys(formData).length !== 0) {
+      const { newTodoTitle, newTodoDescription, newTodoTime } = formData
+      dispatch(createTodoTC(newTodoTitle, newTodoDescription, newTodoTime))
+    }
   }
 
   const todosEl = todosArr.map(t => <TodoItem

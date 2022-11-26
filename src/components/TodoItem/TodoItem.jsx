@@ -12,7 +12,7 @@ const TodoItem = (props) => {
     const [isEditTitle, setIsEditTitle] = useState(false)
     const [isEditDescription, setIsEditDescription] = useState(false)
     // const [isEditIsCompleted, setIsEditIsCompleted] = useState(false)
-    // const [isTodoCompleted, setIsTodoCompleted] = useState(true)
+    // const [isFileUploading, setIsFileUploading] = useState(true)
     const [styleCompleted, setStyleCompleted] = useState(s.title)
     const [styleExpired, setStyleExpired] = useState(s.date)
     const [date, setDate] = useState(props.date)

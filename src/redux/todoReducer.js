@@ -74,6 +74,7 @@ const todoReducer = (state = initialState, action) => {
             } else if (action.formData.editDescription) {
                 stateCopy.todosArr[neededIndex].description = action.formData.editDescription;
             } else if (action.formData.editIsCompleted !== (null || undefined)) {
+                // debugger
                 stateCopy.todosArr[neededIndex].isCompleted = action.formData.editIsCompleted;
             }
             return stateCopy;
@@ -85,6 +86,7 @@ const todoReducer = (state = initialState, action) => {
                 todosArr: [...state.todosArr]
             }
             stateCopy.todosArr[neededIndex] = { ...state.todosArr[neededIndex] }
+            stateCopy.todosArr[neededIndex].filesUrl = [...state.todosArr[neededIndex].filesUrl]
             let filesArr = Object.values(stateCopy.todosArr[neededIndex].filesUrl)
             filesArr.push({ fileUrl: action.url, fileName: action.fileName, fileUid: action.fileUid, fileType: action.fileType })
             stateCopy.todosArr[neededIndex].filesUrl = filesArr
@@ -198,6 +200,7 @@ export const updateTodoTC = (formData, todoUid) => async (dispatch) => {
             description: formData.editDescription,
         })
     } else if (formData.editIsCompleted !== (null || undefined)) {
+        // debugger
         update(ref(database, todoRef), {
             isCompleted: formData.editIsCompleted,
         })
@@ -211,7 +214,7 @@ export const uploadTC = (file, todoUid) => async (dispatch) => {
     const fileUid = uid()
     const todoRef = `/${auth.currentUser.uid}/${todoUid}/filesUrl/${fileUid}`;
     const storageRef = refStorage(storage, `${auth.currentUser.uid}/${todoUid}/files/${file.name}`)
-    dispatch(isFetchingFile(true))
+    // dispatch(isFetchingFile(true))
     uploadBytes(storageRef, file).then((snapshot) => {
         // debugger
         let fileType = snapshot.metadata.contentType
@@ -224,14 +227,15 @@ export const uploadTC = (file, todoUid) => async (dispatch) => {
                     fileName: file.name,
                     fileUid: fileUid,
                     fileType: fileType
+                }).then(() => {
+                    dispatch(upload(url, file.name, todoUid, fileUid, fileType))
+                }).then(() => {
+                    return 'done'
                 })
-                // debugger
-                dispatch(upload(url, file.name, todoUid, fileUid, fileType))
             }
-        }).then(() => {
-            dispatch(isFetchingFile(false))
         })
     })
+    return 'done'
 }
 export const deleteFileTC = (todoUid, fileName, fileUid) => async (dispatch) => {
     const auth = getAuth()
