@@ -16,6 +16,10 @@
     grid-template-rows: 1fr 0.5fr;
     margin-top: 10px;
     margin-bottom: 10px;
+    box-shadow: 0 5px 15px 0 rgb(0 0 0 / 50%);
+    border-radius: 10px;
+    padding: 10px;
+
 }
 .title {
     display: block;
@@ -24,6 +28,9 @@
 .title.active {
     text-decoration: line-through;
     background-color: blueviolet;
+}
+.completedTodo {
+    font-style: italic;
 }
 .date {
     display: block;
@@ -43,8 +50,7 @@
 .main {
     align-items: center;
     display: grid;
-    grid-template-columns: 100px 1fr 60px;
-    height: fit-content;
+    grid-template-columns: 100px 1fr 80px;
 }
 .todoBody {
     padding: 10px;
@@ -52,11 +58,13 @@
     max-width: 230px;
     width: 230px;
     min-height: 100px;
-    min-width: fit-content;
     border-radius: 10px;
     border-radius: 10px;
     background-color: cadetblue;
     box-shadow: 0 5px 15px 0 rgb(0 0 0 / 50%);
+}
+.descriptionBox {
+    margin-bottom: 20px;
 }
 .description {
     word-wrap: break-word;

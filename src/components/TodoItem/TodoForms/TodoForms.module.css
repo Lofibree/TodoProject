@@ -10,8 +10,8 @@
     align-items: center;
 }
 .description textarea {
-    max-width: 200px;
-    min-width: 200px;
+    max-width: 180px;
+    min-width: 180px;
     max-height: 40px;
     min-height: 40px;
 }

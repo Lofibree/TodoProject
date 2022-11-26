@@ -34,7 +34,13 @@ const TodoItem = (props) => {
 
     // DELETE
     const handleDeleteTodo = (uid) => {
-        dispatch(deleteTodoTC(uid))
+        // debugger
+        if (props.filesUrl) {
+            let filesToDelete = Object.values(props.filesUrl)
+            dispatch(deleteTodoTC(uid, filesToDelete))
+        } else {
+            dispatch(deleteTodoTC(uid, []))
+        }
     }
     // EDIT TITLE
     const titleUpdateInit = () => {
@@ -56,7 +62,16 @@ const TodoItem = (props) => {
     return (
         <div className={s.todoItem}>
             <div className={s.header} >
-                <div className={styleCompleted} >Заголовок: {props.title}</div>
+                {props.isCompleted
+                    ? <div>
+                        <div className={styleCompleted} >{props.title}</div>
+                        <div className={s.completedTodo} >Задача завершена</div>
+                    </div>
+                    : <div>
+                        <div>Заголовок:</div>
+                        <div className={styleCompleted} >{props.title}</div>
+                    </div>
+                }
                 <div>
                     <div>
                         {isEditTitle
@@ -77,15 +92,17 @@ const TodoItem = (props) => {
                 </div>
                 <div className={s.todoBody}>
                     <div>
-                        <div className={s.description}>{props.description}</div>
-                        <div>
-                            {isEditDescription
-                                ? <>
-                                    <TodoItemEditDescriptionForm handleDescriptionUpdate={handleSubmit} />
-                                    <button onClick={() => setIsEditDescription(false)}>Отмена</button>
-                                </>
-                                : <button onClick={descriptionUpdateInit} >Изменить описание</button>
-                            }
+                        <div className={s.descriptionBox} >
+                            <div className={s.description}>{props.description}</div>
+                            <div>
+                                {isEditDescription
+                                    ? <>
+                                        <TodoItemEditDescriptionForm handleDescriptionUpdate={handleSubmit} />
+                                        <button onClick={() => setIsEditDescription(false)}>Отмена</button>
+                                    </>
+                                    : <button onClick={descriptionUpdateInit} >Изменить описание</button>
+                                }
+                            </div>
                         </div>
                         <Upload uid={props.uid} filesUrl={props.filesUrl} />
                     </div>

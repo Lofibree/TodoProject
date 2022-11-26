@@ -10,3 +10,20 @@
     height: 50px;
     margin: 2px;
 }
+.fileBox {
+    /* display: flex;
+    align-items: center;
+    justify-content: space-between; */
+    display: grid;
+    grid-template-columns: 80px 100px;
+    grid-gap: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px 0 rgb(0 0 0 / 50%);
+    padding: 10px;
+}
+.fileName {
+    font-size: 12px;
+    max-width: 100px;
+    word-wrap: break-word;
+}
