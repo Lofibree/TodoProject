@@ -11,8 +11,6 @@ const TodoItem = (props) => {
     const dispatch = useDispatch();
     const [isEditTitle, setIsEditTitle] = useState(false)
     const [isEditDescription, setIsEditDescription] = useState(false)
-    // const [isEditIsCompleted, setIsEditIsCompleted] = useState(false)
-    // const [isFileUploading, setIsFileUploading] = useState(true)
     const [styleCompleted, setStyleCompleted] = useState(s.title)
     const [styleExpired, setStyleExpired] = useState(s.date)
     const [date, setDate] = useState(props.date)
@@ -22,17 +20,30 @@ const TodoItem = (props) => {
             setStyleCompleted(s.title + ' ' + s.active)
         } else { setStyleCompleted(s.title) }
 
-        let now = dayjs().locale('ru').format('YYYY-MM-DD')
-        if (now > props.date) {
-            setDate('Просрочено')
-            setStyleExpired(s.date + ' ' + s.expired)
-        } else if(now === props.date) {
-            setDate('СЕГОДНЯ ПОСЛЕДНИЙ ДЕНЬ!!!')
-            setStyleExpired(s.date + ' ' + s.almost)
-        } else { setDate(props.date) }
+        checkDeadline(props.date)
     }, [props.isCompleted, props.date])
 
+    // CHECK DATE
+    /**
+     * Сравнивает текущую дату с датой завершения задачи
+     * @param {string} date дата завершения задачи
+     */
+    const checkDeadline = (date) => {
+        let now = dayjs().locale('ru').format('YYYY-MM-DD')
+        if (now > date) {
+            setDate('Просрочено')
+            setStyleExpired(s.date + ' ' + s.expired)
+        } else if(now === date) {
+            setDate('СЕГОДНЯ ПОСЛЕДНИЙ ДЕНЬ!!!')
+            setStyleExpired(s.date + ' ' + s.almost)
+        } else { setDate(date) }
+    }
+
     // DELETE
+    /**
+     * Вызывает Thunk для удаления Todo
+     * @param {string} uid id Todo'шки
+     */
     const handleDeleteTodo = (uid) => {
         // debugger
         if (props.filesUrl) {
@@ -42,6 +53,7 @@ const TodoItem = (props) => {
             dispatch(deleteTodoTC(uid, []))
         }
     }
+
     // EDIT TITLE
     const titleUpdateInit = () => {
         setIsEditTitle(true)
@@ -50,6 +62,11 @@ const TodoItem = (props) => {
     const descriptionUpdateInit = () => {
         setIsEditDescription(true)
     }
+
+    /**
+     * Вызывает Thunk для изменения значения поля
+     * @param {object} formData данные из формы редактирования поля
+     */
     const handleSubmit = (formData) => {
         if (formData.editTitle) { // EDIT TITLE
             setIsEditTitle(false)
@@ -87,7 +104,6 @@ const TodoItem = (props) => {
             </div>
             <div className={s.main}>
                 <div>
-                    {/* <div>{props.isCompleted ? 'Завершена' : 'Не завершена'}</div> */}
                     <TodoItemEditIsCompletedForm handleIsCompletedUpdate={handleSubmit} />
                 </div>
                 <div className={s.todoBody}>

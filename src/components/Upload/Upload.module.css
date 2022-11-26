@@ -11,9 +11,6 @@
     margin: 2px;
 }
 .fileBox {
-    /* display: flex;
-    align-items: center;
-    justify-content: space-between; */
     display: grid;
     grid-template-columns: 80px 100px;
     grid-gap: 10px;

@@ -2,7 +2,6 @@ import React, { useRef, useState } from 'react';
 import s from './Upload.module.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadTC } from '../../redux/todoReducer';
-import docImg from '../../accets/icons8-microsoft-word-2019-48.png'
 import { deleteFileTC } from '../../redux/todoReducer';
 import Preloader from '../common/Preloader';
 
@@ -14,13 +13,26 @@ const Upload = (props) => {
     // const isFetchingFile = useSelector(state => state.todoPage.isFetchingFile)
     const [isFileUploading, setIsFileUploading] = useState(false)
 
+    /**
+     * Активирует кнопку input с type="file"
+     */
     const handlePick = () => {
         filePicker.current.click()
     }
+
+    /**
+     * Сохраняет выбранный файл
+     * @param {object} e список выбранных файлов
+     */
     const handleChange = (e) => {
         console.log(e.target.files)
         setSelectedFile(e.target.files[0])
     }
+
+    /**
+     * Вызывает Thunk для загрузки файлов 
+     * @returns alert если ничего не выбрано
+     */
     const handleUpload = async () => {
         // debugger
         if (!selectedFile) {
@@ -32,6 +44,12 @@ const Upload = (props) => {
         setIsFileUploading(false)
         setSelectedFile(null)
     }
+
+    /**
+     * Вызывает Thunk для удаления файла
+     * @param {string} fileName имя файла
+     * @param {string} fileUid id файла
+     */
     const deleteFile= (fileName, fileUid) => {
         dispatch(deleteFileTC(props.uid, fileName, fileUid))
     }
@@ -51,7 +69,6 @@ const Upload = (props) => {
                 ? <Preloader />
                 : <> {props.filesUrl !== (null || undefined)
                     ? Object.values(props.filesUrl).map(i => {
-                        // debugger;
                         return (
                             <div  className={s.fileBox}>
                                 <div>

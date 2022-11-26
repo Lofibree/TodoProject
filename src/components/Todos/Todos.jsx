@@ -16,6 +16,10 @@ const Todos = () => {
     dispatch(setTodosTC())
   }, [])
 
+  /**
+   * Вызывает Thunk для создания Todo
+   * @param {object} formData данные из формы создания Todo
+   */
   const handleCreateTodo = (formData) => {
     if (Object.keys(formData).length !== 0) {
       const { newTodoTitle, newTodoDescription, newTodoTime } = formData
@@ -23,6 +27,9 @@ const Todos = () => {
     }
   }
 
+  /**
+   * Массив элементов (Todo'шки)
+   */
   const todosEl = todosArr.map(t => <TodoItem
     uid={t.uid}
     title={t.title}
@@ -31,7 +38,7 @@ const Todos = () => {
     isCompleted={t.isCompleted}
     filesUrl={t.filesUrl}
   />)
-  console.log(todosArr)
+
   return (
     <div className={s.todosBox} >
       <div className={s.title} >Ваши задачи</div>

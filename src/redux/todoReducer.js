@@ -133,7 +133,11 @@ export const isFetchingFile = (isFetchingFile) => ({ type: IS_FETCHING_FILE, isF
 export const isCreatingTodoAC = (isCreatingTodo) => ({ type: IS_CREATING_TODO, isCreatingTodo })
 
 
-export const setTodosTC = () => async (dispatch) => {
+/**
+ * Скачивает Todos из и сохраняет их в store  
+ * @returns 
+ */
+export const setTodosTC = () => (dispatch) => {
     // debugger
     dispatch(setTodos([]))
     const auth = getAuth()
@@ -149,7 +153,15 @@ export const setTodosTC = () => async (dispatch) => {
         }
     })
 }
-export const deleteTodoTC = (uid, filesUrl) => async (dispatch) => {
+
+
+/**
+ * Удаляет Todo из БД и из store
+ * @param {string} uid id Todo'шки
+ * @param {object} filesUrl массив объектов 
+ * @returns 
+ */
+export const deleteTodoTC = (uid, filesUrl) => (dispatch) => {
     // debugger
     const auth = getAuth()
     const database = getDatabase();
@@ -165,7 +177,16 @@ export const deleteTodoTC = (uid, filesUrl) => async (dispatch) => {
             dispatch(deleteTodo(uid))
         })
 }
-export const createTodoTC = (title, description, date) => async (dispatch) => {
+
+
+/**
+ * Создает Todo в БД и в store
+ * @param {string} title заголовок
+ * @param {string} description описание
+ * @param {string} date дата завершения
+ * @returns 
+ */
+export const createTodoTC = (title, description, date) => (dispatch) => {
     // debugger
     dispatch(isCreatingTodoAC(true))
     const auth = getAuth()
@@ -185,7 +206,15 @@ export const createTodoTC = (title, description, date) => async (dispatch) => {
         dispatch(isCreatingTodoAC(false))
     })
 }
-export const updateTodoTC = (formData, todoUid) => async (dispatch) => {
+
+
+/**
+ * Обновляет данные Todo'шки
+ * @param {object} formData измененное значение
+ * @param {string} todoUid id Todo'шки
+ * @returns 
+ */
+export const updateTodoTC = (formData, todoUid) => (dispatch) => {
     // debugger
     const auth = getAuth()
     const database = getDatabase();
@@ -200,14 +229,21 @@ export const updateTodoTC = (formData, todoUid) => async (dispatch) => {
             description: formData.editDescription,
         })
     } else if (formData.editIsCompleted !== (null || undefined)) {
-        // debugger
         update(ref(database, todoRef), {
             isCompleted: formData.editIsCompleted,
         })
     }
     dispatch(updateTodo(formData, todoUid))
 }
-export const uploadTC = (file, todoUid) => async (dispatch) => {
+
+
+/**
+ * Загружает файл в firebase storage и сохраняет в БД и store объект с информацией о файле
+ * @param {object} file загружаемый файл
+ * @param {string} todoUid id Todo'шки
+ * @returns 
+ */
+export const uploadTC = (file, todoUid) => (dispatch) => {
     // debugger
     const auth = getAuth()
     const database = getDatabase();
@@ -216,11 +252,8 @@ export const uploadTC = (file, todoUid) => async (dispatch) => {
     const storageRef = refStorage(storage, `${auth.currentUser.uid}/${todoUid}/files/${file.name}`)
     // dispatch(isFetchingFile(true))
     uploadBytes(storageRef, file).then((snapshot) => {
-        // debugger
         let fileType = snapshot.metadata.contentType
         getDownloadURL(snapshot.ref).then((url) => {
-            // debugger
-
             if (url) {
                 set(ref(database, todoRef), {
                     fileUrl: url,
@@ -237,17 +270,23 @@ export const uploadTC = (file, todoUid) => async (dispatch) => {
     })
     return 'done'
 }
-export const deleteFileTC = (todoUid, fileName, fileUid) => async (dispatch) => {
+
+
+/**
+ * Удаляет файл Todo'шки из firebase storage и удаляет из БД и store объект с информацией о файле
+ * @param {string} todoUid id Todo'шки
+ * @param {string} fileName имя файла
+ * @param {string} fileUid id файла
+ * @returns 
+ */
+export const deleteFileTC = (todoUid, fileName, fileUid) => (dispatch) => {
     const auth = getAuth()
     const database = getDatabase();
-    // const fileUid = uid()
     const todoRef = `/${auth.currentUser.uid}/${todoUid}/filesUrl/${fileUid}`;
     remove(ref(database, todoRef)).then(() => {
-        // debugger
         const storageRef = refStorage(storage, `${auth.currentUser.uid}/${todoUid}/files/${fileName}`)
         deleteObject(storageRef)    
     }).then(() => {
-        // debugger
         dispatch(deleteFile(todoUid, fileUid))
     })
 }

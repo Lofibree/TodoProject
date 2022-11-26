@@ -7,6 +7,9 @@ const LoginWithGoogle = () => {
     const navigate = useNavigate()
     const provider = new GoogleAuthProvider();
 
+    /**
+     * Авторизация через google
+     */
     const handleLogin = () => {
         const auth = getAuth();
         signInWithPopup(auth, provider)

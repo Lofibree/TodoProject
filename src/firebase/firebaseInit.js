@@ -14,7 +14,10 @@ const firebaseConfig = {
 }
 const app = initializeApp(firebaseConfig)
 
-
+/**
+ * Инициализация
+ * @returns 
+ */
 export const initMyFirebase = () => {
 
   if (!getApps().length) {
@@ -26,11 +29,6 @@ export const initMyFirebase = () => {
     console.log('firebase is already initialized')
   }
 }
-// export const auth = () => {
-//   const app = initializeApp(firebaseConfig)
-//   console.log('initialized firebase')
-//   const auth = getAuth(app)
-//   return auth
-// }
+
 export const storage = getStorage(app)
 export const auth = getAuth(app)
