@@ -3,6 +3,7 @@
 ### Using <img src="https://img.shields.io/badge/-Firebase-5A29E4?style=flat-square&logo=firebase" height="25"/> database, storage, authentification and hosting.
 ### State manager - <img src="https://img.shields.io/badge/-Redux-764ABC?style=flat-square&logo=redux" height="25"/>
 
+## Host: <a href='https://todoproject-d56c8.web.app/'>Todo Project</a>
 
 ## Technologies and tools used in this project
 
@@ -27,6 +28,6 @@
 
 ## Options 
 
-CRUD Todo, finish Todo, upload/delete Todo's files. 
+Authorize with Google, CRUD Todo, finish Todo, upload/delete Todo's files. 
 
 
