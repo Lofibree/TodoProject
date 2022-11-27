@@ -20,13 +20,13 @@
   <img src="https://img.shields.io/badge/-Gitlab-000000?style=flat-square&logo=gitlab"   height="35"/>
 </div>
 
-## Used Backend
+## Backend
 
 <div>
 <a href="https://firebase.google.com/"><img src="https://img.shields.io/badge/-Firebase-5A29E4?style=flat-square&logo=firebase" height=30"/></a>
 </div>
 
-## Options 
+## Functionality 
 
 Authorize with Google, CRUD Todo, finish Todo, upload/delete Todo's files. 
 
