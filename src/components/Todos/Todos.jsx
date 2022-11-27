@@ -11,6 +11,7 @@ const Todos = () => {
   const dispatch = useDispatch();
   const todosArr = useSelector(state => state.todoPage.todosArr)
   const isCreatingTodo = useSelector(state => state.todoPage.isCreatingTodo)
+  const isFetchingTodos = useSelector(state => state.todoPage.isFetchingTodos)
 
   useEffect(() => {
     dispatch(setTodosTC())
@@ -36,6 +37,7 @@ const Todos = () => {
     description={t.description}
     date={t.date}
     isCompleted={t.isCompleted}
+    isFetchingFile={t.isFetchingFile}
     filesUrl={t.filesUrl}
   />)
 
@@ -46,7 +48,7 @@ const Todos = () => {
       <div>
         <div>Всего задач: {todosArr.length}</div>
         <div>
-          {isCreatingTodo
+          {isCreatingTodo || isFetchingTodos
             ? <>Loading, please wait <div><Preloader /></div></>
             : <>{ todosEl }</>
           }

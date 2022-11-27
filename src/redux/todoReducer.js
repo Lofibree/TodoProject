@@ -12,13 +12,15 @@ const UPDATE_TODO = 'todoReducer/UPDATE_TODO'
 const UPLOAD = 'todoReducer/UPLOAD'
 const DELETE_FILE = 'todoReducer/DELETE_FILE'
 const IS_FETCHING_FILE = 'todoReducer/IS_FETCHING_FILE'
+const IS_FETCHING_TODOS = 'todoReducer/IS_FETCHING_TODOS'
 const IS_CREATING_TODO = 'todoReducer/IS_CREATING_TODO'
 
 
 let initialState = {
     todosArr: [], 
     isFetchingFile: false,
-    isCreatingTodo: false
+    isFetchingTodos: false,
+    isCreatingTodo: false,
 }
 
 
@@ -53,6 +55,7 @@ const todoReducer = (state = initialState, action) => {
                     description: action.description,
                     date: action.date,
                     isCompleted: false,
+                    isFetchingFile: false,
                     filesUrl: []
                 }
                 return {
@@ -107,9 +110,22 @@ const todoReducer = (state = initialState, action) => {
             return stateCopy;
         }
         case IS_FETCHING_FILE: {
+            // debugger
+            let neededIndex = state.todosArr.findIndex(t => t.uid === action.todoUid);
+            // debugger
+            let stateCopy = {
+                ...state,
+                todosArr: [...state.todosArr]
+            }
+            stateCopy.todosArr[neededIndex] = { ...state.todosArr[neededIndex] }
+            stateCopy.todosArr[neededIndex].isFetchingFile = action.isFetchingFile;
+            return stateCopy;
+        }
+        case IS_FETCHING_TODOS: {
+            // debugger
             return {
                 ...state,
-                isFetchingFile: action.isFetchingFile
+                isFetchingTodos: action.isFetchingTodos
             }
         }
         case IS_CREATING_TODO: {
@@ -129,7 +145,8 @@ export const createTodo = (todoUid, title, description, date) => ({ type: CREATE
 export const updateTodo = (formData, todoUid) => ({ type: UPDATE_TODO, formData, todoUid })
 export const upload = (url, fileName, todoUid, fileUid, fileType) => ({ type: UPLOAD, url, fileName, todoUid, fileUid, fileType })
 export const deleteFile = (todoUid, fileUid) => ({ type: DELETE_FILE, todoUid, fileUid })
-export const isFetchingFile = (isFetchingFile) => ({ type: IS_FETCHING_FILE, isFetchingFile })
+export const isFetchingFileAC = (isFetchingFile, todoUid) => ({ type: IS_FETCHING_FILE, isFetchingFile, todoUid })
+export const isFetchingTodosAC = (isFetchingTodos) => ({ type: IS_FETCHING_TODOS, isFetchingTodos })
 export const isCreatingTodoAC = (isCreatingTodo) => ({ type: IS_CREATING_TODO, isCreatingTodo })
 
 
@@ -139,6 +156,7 @@ export const isCreatingTodoAC = (isCreatingTodo) => ({ type: IS_CREATING_TODO, i
  */
 export const setTodosTC = () => (dispatch) => {
     // debugger
+    dispatch(isFetchingTodosAC(true))
     dispatch(setTodos([]))
     const auth = getAuth()
     const todosListRef = `/${auth.currentUser.uid}`;
@@ -151,6 +169,8 @@ export const setTodosTC = () => (dispatch) => {
                 dispatch(setTodos(Object.values(data)))
             }
         }
+    }).then(() => {
+        dispatch(isFetchingTodosAC(false))
     })
 }
 
@@ -200,6 +220,7 @@ export const createTodoTC = (title, description, date) => (dispatch) => {
         description: description,
         date: date,
         isCompleted: false,
+        isFetchingFile: false
     }).then(() => {
         dispatch(createTodo(todoUid, title, description, date))
     }).then(() => {
@@ -248,27 +269,47 @@ export const uploadTC = (file, todoUid) => (dispatch) => {
     const auth = getAuth()
     const database = getDatabase();
     const fileUid = uid()
-    const todoRef = `/${auth.currentUser.uid}/${todoUid}/filesUrl/${fileUid}`;
+    const fileRef = `/${auth.currentUser.uid}/${todoUid}/filesUrl/${fileUid}`;
     const storageRef = refStorage(storage, `${auth.currentUser.uid}/${todoUid}/files/${file.name}`)
-    // dispatch(isFetchingFile(true))
-    uploadBytes(storageRef, file).then((snapshot) => {
-        let fileType = snapshot.metadata.contentType
-        getDownloadURL(snapshot.ref).then((url) => {
-            if (url) {
-                set(ref(database, todoRef), {
-                    fileUrl: url,
-                    fileName: file.name,
-                    fileUid: fileUid,
-                    fileType: fileType
-                }).then(() => {
-                    dispatch(upload(url, file.name, todoUid, fileUid, fileType))
-                }).then(() => {
-                    return 'done'
-                })
-            }
+    dispatch(isFetchingFileTC(true, todoUid)) 
+        uploadBytes(storageRef, file).then((snapshot) => {
+            let fileType = snapshot.metadata.contentType
+            getDownloadURL(snapshot.ref).then((url) => {
+                if (url) {
+                    set(ref(database, fileRef), {
+                        fileUrl: url,
+                        fileName: file.name,
+                        fileUid: fileUid,
+                        fileType: fileType
+                    }).then(() => {
+                        dispatch(upload(url, file.name, todoUid, fileUid, fileType))
+                    }).then(() => {
+                        dispatch(isFetchingFileTC(false, todoUid)) 
+                    })
+                }
+            })
         })
+}
+
+
+/**
+ * Отвечает за появление и исчезновение Preloader когда файл загружается 
+ * @param {boolean} isFetchingFile загружается ли файл
+ * @param {string} todoUid id Todo'шки 
+ * @returns 
+ */
+export const isFetchingFileTC = (isFetchingFile, todoUid) => (dispatch) => {
+    // debugger
+    const auth = getAuth()
+    const database = getDatabase();
+    const todoRef = `/${auth.currentUser.uid}/${todoUid}`;
+    update(ref(database, todoRef), {
+        isFetchingFile: isFetchingFile,
+    }).then(() => {
+        // debugger
+        dispatch(isFetchingFileAC(isFetchingFile, todoUid))
     })
-    return 'done'
+
 }
 
 

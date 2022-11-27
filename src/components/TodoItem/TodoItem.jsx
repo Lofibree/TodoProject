@@ -120,7 +120,7 @@ const TodoItem = (props) => {
                                 }
                             </div>
                         </div>
-                        <Upload uid={props.uid} filesUrl={props.filesUrl} />
+                        <Upload uid={props.uid} filesUrl={props.filesUrl} isFetchingFile={props.isFetchingFile} />
                     </div>
                 </div>
                 <div>

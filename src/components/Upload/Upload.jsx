@@ -39,9 +39,9 @@ const Upload = (props) => {
             alert('Пожалуйста выберите файл');
             return;
         }
-        setIsFileUploading(true)
+        // setIsFileUploading(true)
         dispatch(uploadTC(selectedFile, props.uid))
-        setIsFileUploading(false)
+        // setIsFileUploading(false)
         setSelectedFile(null)
     }
 
@@ -65,7 +65,7 @@ const Upload = (props) => {
                 </>
             }
             <div>Прикрепленные файлы</div>
-            {isFileUploading
+            {props.isFetchingFile
                 ? <Preloader />
                 : <> {props.filesUrl !== (null || undefined)
                     ? Object.values(props.filesUrl).map(i => {
