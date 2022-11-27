@@ -27,6 +27,6 @@
 
 ## Options 
 
-CRUD Todo, finish todo, upload/delete todo's files. 
+CRUD Todo, finish Todo, upload/delete Todo's files. 
 
 
